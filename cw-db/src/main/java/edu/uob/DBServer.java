@@ -16,6 +16,9 @@ public class DBServer {
 
     private static final char END_OF_TRANSMISSION = 4;
     private String storageFolderPath;
+    private DatabaseManager dbManager;
+    private TableManager tableManager;
+    private String currentDatabase;
 
     public static void main(String args[]) throws IOException {
         DBServer server = new DBServer();
@@ -27,6 +30,7 @@ public class DBServer {
     */
     public DBServer() {
         storageFolderPath = Paths.get("databases").toAbsolutePath().toString();
+        dbManager = new DatabaseManager(storageFolderPath);
         try {
             // Create the database storage folder if it doesn't already exist !
             Files.createDirectories(Paths.get(storageFolderPath));
@@ -43,7 +47,33 @@ public class DBServer {
     */
     public String handleCommand(String command) {
         // TODO implement your server logic here
-        return "Working????";
+        command = command.trim().toUpperCase();
+
+        if (command.startsWith("CREATE DATABASE")) {
+            return dbManager.createDatabase(command.split(" ")[2]);
+        } else if (command.startsWith("USE")) {
+            return useDatabase(command.split(" ")[1]);
+        } else if (command.startsWith("CREATE TABLE")) {
+            return tableManager.createTable(command.split(" ")[2]);
+        }
+//        else if (command.startsWith("INSERT INTO")) {
+//            String[] parts = command.split(" ", 4);
+//            return tableManager.insertIntoTable(parts[2], parts[3]);
+//        } else if (command.startsWith("SELECT * FROM")) {
+//            return tableManager.selectFromTable(command.split(" ")[3]);
+//        }
+        else {
+            return "ERROR: Invalid SQL command.";
+        }
+    }
+
+    private String useDatabase(String dbName) {
+        if (!dbManager.databaseExists(dbName)) {
+            return "ERROR: Database does not exist.";
+        }
+        currentDatabase = dbName;
+        tableManager = new TableManager(storageFolderPath + "/" + currentDatabase);
+        return "Using database '" + dbName + "'.";
     }
 
     //  === Methods below handle networking aspects of the project - you will not need to change these ! ===
