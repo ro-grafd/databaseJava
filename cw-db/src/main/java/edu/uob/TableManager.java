@@ -10,6 +10,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Paths;
 import java.nio.file.Files;
+import java.io.FileWriter;
+import java.util.List;
+
 public class TableManager {
     private String databasePath;
 
@@ -17,14 +20,20 @@ public class TableManager {
         this.databasePath = dbPath;
     }
 
-    public String createTable(String tableName) {
-        File tableFile = new File(databasePath, tableName + ".txt");
+    public String createTable(String tableName , List<String> attributes) {
+        File tableFile = new File(databasePath, tableName + ".csv");
+
         if (tableFile.exists()) {
             return "ERROR: Table already exists.";
         }
+
         try {
             if (tableFile.createNewFile()) {
-                return "Table '" + tableName + "' created successfully.";
+                // Write attributes to the file as the first line
+                try (FileWriter writer = new FileWriter(tableFile)) {
+                    writer.write(String.join(",", attributes) + "\n");
+                }
+                return "Table '" + tableName + "' created successfully with attributes: " + attributes;
             } else {
                 return "ERROR: Failed to create table.";
             }

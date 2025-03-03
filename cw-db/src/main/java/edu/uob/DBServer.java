@@ -10,6 +10,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Paths;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 
 /** This class implements the DB server. */
 public class DBServer {
@@ -48,14 +51,47 @@ public class DBServer {
     public String handleCommand(String command) {
         // TODO implement your server logic here
         command = command.trim().toUpperCase();
+        CreateTokenizer tokenizer = new CreateTokenizer(); // Later without instance also it will, ask Simon!!!
+        String[] words = tokenizer.tokenizeQuery(command);
+        if (Objects.equals(words[0], "CREATE") && Objects.equals(words[1], "DATABASE") && Objects.equals(words[words.length-1], ";")) {
+            return dbManager.createDatabase(words[2]);
+        } else if (Objects.equals(words[0], "USE") && Objects.equals(words[words.length-1], ";")) {
+//            for (String word : words) {
+//                System.out.println(word);
+//            }
+            return useDatabase(words[1]);
+        } else if (Objects.equals(words[0], "CREATE") && Objects.equals(words[1], "TABLE") && Objects.equals(words[words.length-1], ";")) {
+            // Extract table name from the tokenized query
+            String tableName = words[2]; // Third word is the table name
 
-        if (command.startsWith("CREATE DATABASE")) {
-            return dbManager.createDatabase(command.split(" ")[2]);
-        } else if (command.startsWith("USE")) {
-            return useDatabase(command.split(" ")[1]);
-        } else if (command.startsWith("CREATE TABLE")) {
-            return tableManager.createTable(command.split(" ")[2]);
+            // Extract attributes from the words array
+            ArrayList<String> attributes = new ArrayList<>();
+            boolean insideParentheses = false;
+
+            for (int i = 3; i < words.length; i++) {
+                if (words[i].equals("(")) {
+                    insideParentheses = true;
+                    continue;
+                }
+                if (words[i].equals(")")) {
+                    insideParentheses = false;
+                    break;
+                }
+                if (insideParentheses && !Objects.equals(words[i], ",")) {
+                    attributes.add(words[i]);
+                }
+            }
+
+            // Print results (for debugging)
+            System.out.println("Table Name: " + tableName);
+            System.out.println("Attributes: " + attributes);
+//            for (String s : attributes) {
+//                System.out.println(s);
+//            }
+            return tableManager.createTable(words[2], attributes);
         }
+//
+
 //        else if (command.startsWith("INSERT INTO")) {
 //            String[] parts = command.split(" ", 4);
 //            return tableManager.insertIntoTable(parts[2], parts[3]);
