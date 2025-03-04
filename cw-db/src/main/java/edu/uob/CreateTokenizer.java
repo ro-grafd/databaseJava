@@ -3,9 +3,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class CreateTokenizer {
-    static String[] specialCharacters = {"(", ")", ",", ";"};
-
-    public static String[] tokenizeQuery(String query) {
+    private String[] specialCharacters = {"(", ")", ",", ";"};
+    private String query;
+    private ArrayList<String> tokens;
+    public CreateTokenizer(String query) {
+        this.query = query;
+        tokens = new ArrayList<>();
+    }
+    public  ArrayList<String> tokenizeQuery() {
         ArrayList<String> tokens = new ArrayList<>();
 
         // Split the query on single quotes (to handle string literals properly)
@@ -21,10 +26,10 @@ public class CreateTokenizer {
                 tokens.addAll(Arrays.asList(nextBatchOfTokens));
             }
         }
-        return tokens.toArray(new String[0]);
+        return tokens;
     }
 
-    private static String[] tokenise(String input) {
+    private  String[] tokenise(String input) {
         // Add spaces around special characters for proper separation
         for (String specialChar : specialCharacters) {
             input = input.replace(specialChar, " " + specialChar + " ");

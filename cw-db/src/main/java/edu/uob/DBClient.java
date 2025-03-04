@@ -13,7 +13,7 @@ public class DBClient {
 
     public static void main(String[] args) throws IOException {
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-        Socket socket = new Socket("localhost", 8000);
+        Socket socket = new Socket("localhost", 8009);
         BufferedReader socketReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         BufferedWriter socketWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         while (!Thread.interrupted()) {

@@ -25,7 +25,7 @@ public class DBServer {
 
     public static void main(String args[]) throws IOException {
         DBServer server = new DBServer();
-        server.blockingListenOn(8000);
+        server.blockingListenOn(8009);
     }
 
     /**
@@ -51,56 +51,11 @@ public class DBServer {
     public String handleCommand(String command) {
         // TODO implement your server logic here
         command = command.trim().toUpperCase();
-        CreateTokenizer tokenizer = new CreateTokenizer(); // Later without instance also it will, ask Simon!!!
-        String[] words = tokenizer.tokenizeQuery(command);
-        if (Objects.equals(words[0], "CREATE") && Objects.equals(words[1], "DATABASE") && Objects.equals(words[words.length-1], ";")) {
-            return dbManager.createDatabase(words[2]);
-        } else if (Objects.equals(words[0], "USE") && Objects.equals(words[words.length-1], ";")) {
-//            for (String word : words) {
-//                System.out.println(word);
-//            }
-            return useDatabase(words[1]);
-        } else if (Objects.equals(words[0], "CREATE") && Objects.equals(words[1], "TABLE") && Objects.equals(words[words.length-1], ";")) {
-            // Extract table name from the tokenized query
-            String tableName = words[2]; // Third word is the table name
+        CreateTokenizer tokenizer = new CreateTokenizer(command);
+        ArrayList<String>blocks = tokenizer.tokenizeQuery();
+        Parser parser = new Parser(blocks);
 
-            // Extract attributes from the words array
-            ArrayList<String> attributes = new ArrayList<>();
-            boolean insideParentheses = false;
-
-            for (int i = 3; i < words.length; i++) {
-                if (words[i].equals("(")) {
-                    insideParentheses = true;
-                    continue;
-                }
-                if (words[i].equals(")")) {
-                    insideParentheses = false;
-                    break;
-                }
-                if (insideParentheses && !Objects.equals(words[i], ",")) {
-                    attributes.add(words[i]);
-                }
-            }
-
-            // Print results (for debugging)
-            System.out.println("Table Name: " + tableName);
-            System.out.println("Attributes: " + attributes);
-//            for (String s : attributes) {
-//                System.out.println(s);
-//            }
-            return tableManager.createTable(words[2], attributes);
-        }
-//
-
-//        else if (command.startsWith("INSERT INTO")) {
-//            String[] parts = command.split(" ", 4);
-//            return tableManager.insertIntoTable(parts[2], parts[3]);
-//        } else if (command.startsWith("SELECT * FROM")) {
-//            return tableManager.selectFromTable(command.split(" ")[3]);
-//        }
-        else {
-            return "ERROR: Invalid SQL command.";
-        }
+        return "";
     }
 
     private String useDatabase(String dbName) {
