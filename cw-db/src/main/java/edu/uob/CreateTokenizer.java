@@ -3,9 +3,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class CreateTokenizer {
-    private String[] specialCharacters = {"(", ")", ",", ";"};
+    private static final String[] specialCharacters = {"(",")",",",";", "=", "<", ">"};
+    private static final String[] OTHER_CHARACTERS = {" <  = ", " =  = ", " >  = ", "! ="};
     private String query;
-    private ArrayList<String> tokens;
+    private static ArrayList<String> tokens;
     public CreateTokenizer(String query) {
         this.query = query;
         tokens = new ArrayList<>();
@@ -34,7 +35,11 @@ public class CreateTokenizer {
         for (String specialChar : specialCharacters) {
             input = input.replace(specialChar, " " + specialChar + " ");
         }
-
+        // converting "  !   =    " to "!="
+        for (String temp: OTHER_CHARACTERS)
+        {
+            input = input.replace(temp, " "+ temp.replaceAll("\\s+","") + " ");
+        }
         // Remove multiple spaces
         while (input.contains("  ")) {
             input = input.replace("  ", " ");

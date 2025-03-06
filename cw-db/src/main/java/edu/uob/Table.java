@@ -24,6 +24,9 @@ class Table {
     {
         return tableName;
     }
+    public void addValues(String tableName, ArrayList<String> values){
+
+    }
     public void displayTableDetails() {
         System.out.println("Columns: " + colNames);
         System.out.println("Total Columns: " + totalColumns);

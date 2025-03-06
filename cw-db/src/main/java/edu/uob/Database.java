@@ -1,11 +1,6 @@
 package edu.uob;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Path;
@@ -23,8 +18,25 @@ class Database {
         this.name = name;
         this.tables = new ArrayList<>();
     }
+    public void deleteTable(Table tableToDelete) {
+        // Remove from in-memory collection
+        tables.remove(tableToDelete);
+        // Delete the physical table file
+        File dbFolder = new File(storagePath + "/" + name);
+        File tableFile = new File(dbFolder, tableToDelete.getName() + ".tab");
 
-    public void addTable(Table table) {
+        if (tableFile.exists() && tableFile.isFile()) {
+            boolean deleted = tableFile.delete();
+            if (deleted) {
+                System.out.println("Table file deleted: " + tableFile.getAbsolutePath());
+            } else {
+                System.out.println("Failed to delete table file: " + tableFile.getAbsolutePath());
+            }
+        } else {
+            System.out.println("Warning: Table file not found at: " + tableFile.getAbsolutePath());
+        }
+    }
+    public void addTable(Table table, ArrayList<String> columns) {
         tables.add(table);
         // Ensure the database folder exists
         File dbFolder = new File(storagePath + "/" + name);  // Assuming the database folder is named after the database
@@ -48,6 +60,26 @@ class Database {
                 boolean fileCreated = tableFile.createNewFile();
                 if (fileCreated) {
                     System.out.println("Table file created: " + tableFile.getAbsolutePath());
+
+                    // Write column headers to the file
+                    try (FileWriter writer = new FileWriter(tableFile)) {
+                        // Always add "id" as the first column
+                        writer.write("id\t");
+
+                        // Add the rest of the columns if not empty
+                        if (columns != null && !columns.isEmpty()) {
+                            for (String column : columns) {
+                                writer.write( "\t" + column);
+                            }
+                        }
+
+                        // Add a newline at the end
+                        writer.write("\n");
+
+                        System.out.println("Column headers added to the table file.");
+                    } catch (IOException e) {
+                        System.out.println("Error writing to table file: " + e.getMessage());
+                    }
                 } else {
                     System.out.println("Failed to create the table file.");
                 }
@@ -69,6 +101,14 @@ class Database {
             }
         }
         return false;
+    }
+    public Table getTable(String tableName) {
+        for (Table tb : tables) {
+            if(tb.getName().equals(tableName)){
+                return tb;
+            }
+        }
+        return null;
     }
     public void displayDatabaseDetails() {
         System.out.println("Database: " + name);

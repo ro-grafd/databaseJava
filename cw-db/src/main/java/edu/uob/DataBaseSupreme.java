@@ -24,7 +24,57 @@ class DataBaseSupreme {
         this.databases = new ArrayList<>();
         this.databasenames = new ArrayList<>();
     }
+    public Database getDatabase(String databaseDelete){
+        for (Database database : databases) {
+            if (database.getName().equals(databaseDelete)) {
+                return database;
+            }
+        }
+        return null;
+    }
+    public void deleteDatabase(Database databaseToDelete) {
+        // Remove from in-memory collections
+        databases.remove(databaseToDelete);
+        databasenames.remove(databaseToDelete.getName());
 
+        // Delete the physical database directory and its contents
+        Path dbDirectoryPath = Paths.get(storagePath, databaseToDelete.getName());
+        File dbDirectory = dbDirectoryPath.toFile();
+
+        if (dbDirectory.exists() && dbDirectory.isDirectory()) {
+            // Delete all files and subdirectories
+            try {
+                deleteDirectoryRecursively(dbDirectory);
+                System.out.println("Database directory deleted: " + dbDirectoryPath.toAbsolutePath());
+            } catch (IOException e) {
+                System.out.println("Error deleting database directory: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Warning: Database directory not found at: " + dbDirectoryPath.toAbsolutePath());
+        }
+    }
+
+    // Helper method to recursively delete a directory
+    private void deleteDirectoryRecursively(File directory) throws IOException {
+        // Delete all files and subdirectories
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    deleteDirectoryRecursively(file);
+                } else {
+                    if (!file.delete()) {
+                        throw new IOException("Failed to delete file: " + file);
+                    }
+                }
+            }
+        }
+
+        // Delete the empty directory
+        if (!directory.delete()) {
+            throw new IOException("Failed to delete directory: " + directory);
+        }
+    }
     public void addDatabase(Database db) {
         Path dbDirectoryPath = Paths.get(storagePath, db.getName());
 
