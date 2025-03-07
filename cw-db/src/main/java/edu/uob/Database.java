@@ -64,7 +64,7 @@ class Database {
                     // Write column headers to the file
                     try (FileWriter writer = new FileWriter(tableFile)) {
                         // Always add "id" as the first column
-                        writer.write("id\t");
+                        writer.write("id");
 
                         // Add the rest of the columns if not empty
                         if (columns != null && !columns.isEmpty()) {

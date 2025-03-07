@@ -30,9 +30,14 @@ public class CommandParser {
             return handleDropTable(tokens);
         } else if(tokens.size() >= 6 && tokens.get(0).equalsIgnoreCase("INSERT") && tokens.get(1).equalsIgnoreCase("INTO") && tokens.get(3).equalsIgnoreCase("VALUES") && tokens.get(4).equals("(") && tokens.get(tokens.size()-2).equals(")") && tokens.get(tokens.size()-1).equals(";")) {
             return handleInsert(tokens);
+        } else if(tokens.size() == 5 && tokens.get(0).equalsIgnoreCase("ALTER") && tokens.get(1).equalsIgnoreCase("TABLE") && tokens.get(tokens.size()-1).equals(";") ){
+            return handleAlterTable(tokens);
         }
         // Handle other types of commands (if any) here
         return "Invalid command!";
+    }
+    private String handleAlterTable(ArrayList<String> tokens) {
+
     }
     private String handleDropTable(ArrayList<String> tokens) {
         String tableName = tokens.get(2);
@@ -72,17 +77,15 @@ public class CommandParser {
     private void getValues(ArrayList<String> tokens, ArrayList<String> values) {
         int valuesIndex = -1;
         for (int i = 0; i < tokens.size(); i++) {
-            if (tokens.get(i).equals("VALUES")) {
+            if (tokens.get(i).equalsIgnoreCase("VALUES")) {
                 valuesIndex = i;
                 break;
             }
         }
-
         // If "VALUES" keyword not found, return empty list
         if (valuesIndex == -1) {
             return;
         }
-
         // Find the opening parenthesis that comes after "VALUES"
         int openParenIndex = -1;
         for (int i = valuesIndex + 1; i < tokens.size(); i++) {
@@ -91,15 +94,12 @@ public class CommandParser {
                 break;
             }
         }
-
         // If no opening parenthesis found, return empty list
         if (openParenIndex == -1) {
             return;
         }
-
         // Start from the element after the opening parenthesis
         int i = openParenIndex + 1;
-
         // Continue until we hit the closing parenthesis
         while (i < tokens.size() && !tokens.get(i).equals(")")) {
             // Skip commas
@@ -121,7 +121,7 @@ public class CommandParser {
         }
         ArrayList<String> columns = new ArrayList<>();
         getColumns(tokens,columns);
-        db.addTable(new Table(tableName), columns);
+        db.addTable(new Table(tableName,columns, db.getName()), columns);
         return "Table created!";
     }
     private void getColumns(ArrayList<String> tokens, ArrayList<String> columns)
