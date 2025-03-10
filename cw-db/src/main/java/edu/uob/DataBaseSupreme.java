@@ -24,14 +24,42 @@ class DataBaseSupreme {
         this.databases = new ArrayList<>();
         this.databasenames = new ArrayList<>();
     }
-    public Database getDatabase(String databaseDelete){
+    public Database getDatabase(String databaseDelete) {
+        // Check in-memory databases first
         for (Database database : databases) {
             if (database.getName().equals(databaseDelete)) {
                 return database;
             }
         }
+
+        // If not found in-memory, check the file system
+        File dbFolder = new File(storagePath, databaseDelete);
+        if (dbFolder.exists() && dbFolder.isDirectory()) {
+            // If the folder exists in the file system, create a new Database object and return it
+            Database db = new Database(databaseDelete, storagePath);
+            // Optionally, load the tables for this database from the file system
+            loadTablesFromFileSystem(db);
+            databases.add(db);  // Add the database to the in-memory list
+            return db;
+        }
+
+        // If the database doesn't exist either in-memory or on the file system
         return null;
     }
+
+    private void loadTablesFromFileSystem(Database db) {
+        // Load tables from the file system (assuming the tables are stored in dbName folder)
+        File dbFolder = new File(storagePath, db.getName());
+        File[] tableFiles = dbFolder.listFiles((dir, name) -> name.endsWith(".tab")); // Assuming .tab extension for tables
+
+        if (tableFiles != null) {
+            for (File tableFile : tableFiles) {
+                // Assuming each table file is loaded by the loadTableFromFile method
+                db.loadTableFromFile(tableFile);
+            }
+        }
+    }
+
     public void deleteDatabase(Database databaseToDelete) {
         // Remove from in-memory collections
         databases.remove(databaseToDelete);

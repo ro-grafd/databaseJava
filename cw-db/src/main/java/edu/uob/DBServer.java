@@ -54,6 +54,7 @@ public class DBServer {
             System.out.println(token);
         }
         String result = commandParser.parseQuery(tokens);
+//        result += "[OK]";
         return result;
     }
 

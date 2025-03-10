@@ -117,4 +117,49 @@ class Database {
             System.out.println("------------------");
         }
     }
+    public void loadTableFromFile(File tableFile) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(tableFile))) {
+            String headerLine = reader.readLine(); // Read first line (column headers)
+            if (headerLine == null || headerLine.trim().isEmpty()) {
+                System.out.println("ERROR: Table file is empty or corrupted: " + tableFile.getName());
+                return;
+            }
+            // Extract column names from the first line
+//            System.out.println(headerLine);
+            ArrayList<String> columns = new ArrayList<>(Arrays.asList(headerLine.trim().split("\\s+")));
+            if (columns.get(0).equals("id")) {
+                columns.remove(0);
+            }
+            // Create a new Table instance
+            Table table = new Table(tableFile.getName().replace(".tab", ""), columns, this.name);
+            // Read the remaining rows to populate data and update totalRows
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Split each row into individual column values
+                List<String> rowData = new ArrayList<>(Arrays.asList(line.split("\\s*,\\s*")));
+                table.data.add(rowData);
+            }
+            // Update table details
+            table.totalRows = table.data.size();
+            table.totalColumns = table.colNames.size();
+            // Add the table to the list
+
+            tables.add(table);
+            System.out.println("Table '" + table.getName() + "' loaded successfully from file.");
+        } catch (IOException e) {
+            System.out.println("ERROR: Unable to read table file: " + tableFile.getName());
+        }
+    }
+
+    public boolean searchTableFile(String tableName) {
+        return tables.stream().anyMatch(t -> t.getName().equalsIgnoreCase(tableName));
+    }
+
+    public Table getTableFile(String tableName) {
+        return tables.stream()
+                .filter(t -> t.getName().equalsIgnoreCase(tableName))
+                .findFirst()
+                .orElse(null);
+    }
+
 }
