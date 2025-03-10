@@ -39,10 +39,84 @@ public class CommandParser {
             return handleUpdate(tokens);
         } else if(tokens.get(0).equalsIgnoreCase("DELETE") && tokens.get(1).equalsIgnoreCase("FROM") && tokens.get(tokens.size()-1).equals(";") ) {
             return handleDelete(tokens);
+        } else if(tokens.size() == 9 && tokens.get(0).equalsIgnoreCase("JOIN") && tokens.get(2).equalsIgnoreCase("AND")  && tokens.get(4).equalsIgnoreCase("ON") && tokens.get(6).equalsIgnoreCase("AND") && tokens.get(8).equalsIgnoreCase(";") ) {
+            return handleJoin(tokens);
         }
         // Handle other types of commands (if any) here
         return "Invalid command!";
     }
+    private String handleJoin(ArrayList<String> tokens) {
+        String tb1 = tokens.get(1);
+        String tb2 = tokens.get(3);
+        String at1 = tokens.get(5);
+        String at2 = tokens.get(7);
+        Database db = dataBaseSupreme.getCurrentDatabase();
+        Table table1 = getTableFromName(tb1);
+        Table table2 = getTableFromName(tb2);
+        // Get the tables from your data structure (assuming you have tables stored somewhere)
+        List<Map<String, String>> tableMap1 = convertDataToListMap(table1.data,table1.getColumns());
+        List<Map<String, String>> tableMap2 = convertDataToListMap(table2.data, table2.getColumns());
+
+        // Create a list to store the joined records
+        List<Map<String, String>> joinedTable = new ArrayList<>();
+
+        // Perform the join operation
+        for (Map<String, String> row1 : tableMap1) {
+            for (Map<String, String> row2 : tableMap2) {
+                // Check if join attributes match
+                if (row1.containsKey(at1) && row2.containsKey(at2) &&
+                        row1.get(at1).equals(row2.get(at2))) {
+
+                    // Create a new map for the joined row
+                    Map<String, String> joinedRow = new HashMap<>();
+
+                    // Add all columns from table1 except the join attribute
+                    for (Map.Entry<String, String> entry : row1.entrySet()) {
+                        if (!entry.getKey().equals(at1)) {
+                            joinedRow.put(tb1 + "." + entry.getKey(), entry.getValue());
+                        }
+                    }
+
+                    // Add all columns from table2 except the join attribute
+                    for (Map.Entry<String, String> entry : row2.entrySet()) {
+                        if (!entry.getKey().equals(at2)) {
+                            joinedRow.put(tb2 + "." + entry.getKey(), entry.getValue());
+                        }
+                    }
+
+                    // Add the joined row to our result
+                    joinedTable.add(joinedRow);
+                }
+            }
+        }
+
+        // Return the string representation of the joined table
+        return joinedTable.toString();
+    }
+    private List<Map<String, String>> convertDataToListMap(List<List<String>> data, List<String> columns) {
+        List<Map<String, String>> result = new ArrayList<>();
+
+        // Check if data is empty or if columns are not provided
+        if (data.isEmpty() || columns.isEmpty()) {
+            return result;
+        }
+
+        // Process each row in the data
+        for (List<String> row : data) {
+            Map<String, String> rowMap = new HashMap<>();
+
+            // Map each column value to its corresponding header
+            for (int j = 0; j < columns.size() && j < row.size(); j++) {
+                rowMap.put(columns.get(j), row.get(j));
+            }
+
+            result.add(rowMap);
+        }
+
+        return result;
+    }
+
+
     private String handleDelete(ArrayList<String> tokens) {
         if (tokens.size() < 4 || !tokens.get(1).equalsIgnoreCase("FROM")) {
             return "[ERROR]: Invalid DELETE query syntax!";
@@ -626,6 +700,7 @@ public class CommandParser {
         }
         // Retrieve the table (now it should be in memory)
         Table tb = db.getTable(tableName);
+        tb.databaseName = db.getName();
         if (tb == null) {
             return "[ERROR]: Unable to retrieve table " + tableName;
         }
@@ -633,7 +708,7 @@ public class CommandParser {
         ArrayList<String> values = new ArrayList<>();
         getValues(tokens, values);
         // Add values to the table
-        if(values.size() + 1 != tb.totalColumns ) {
+        if(values.size() + 1 != tb.colNames.size() ) {
             return "[ERROR]Table has" + (tb.totalColumns - 1) + " column(s)!";
         }
         tb.addValues(tableName, values);
@@ -700,7 +775,8 @@ public class CommandParser {
         getColumns(tokens, columns);
 
         // Create and add the table
-        db.addTable(new Table(tableName, columns, db.getName()), columns);
+        Table tb = new Table(tableName,columns, db.getName());
+        db.addTable(tb, columns);
 
         // Create the table file in the database directory
         try {

@@ -1,5 +1,6 @@
 package edu.uob;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -242,7 +243,7 @@ class Table {
             File tableFile = new File(dbFolder, tableName + ".tab");
 
             // Append to the file using FileWriter with append flag set to true
-            try (FileWriter writer = new FileWriter(tableFile, true)) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(tableFile, true))) {
                 // Write the ID first
                 writer.write(id);
 
@@ -254,7 +255,10 @@ class Table {
                 // Add a newline at the end of the row
                 writer.write("\n");
 
-                System.out.println("Row added to table file: " + tableFile.getAbsolutePath());
+                // Force flush to ensure data is written
+                writer.flush();
+
+                System.out.println("Row successfully added to table file");
             }
         } catch (IOException e) {
             System.out.println("Error writing to table file: " + e.getMessage());
