@@ -1,12 +1,12 @@
-/home/np24437/OOPs Java/week 7/databaseJava/cw-db/src/main/java/edu/uob/ConditionNode.java
-/home/np24437/OOPs Java/week 7/databaseJava/cw-db/src/main/java/edu/uob/DBClient.java
-/home/np24437/OOPs Java/week 7/databaseJava/cw-db/src/main/java/edu/uob/Database.java
-/home/np24437/OOPs Java/week 7/databaseJava/cw-db/src/main/java/edu/uob/CommandParser.java
-/home/np24437/OOPs Java/week 7/databaseJava/cw-db/src/main/java/edu/uob/DataBaseSupreme.java
-/home/np24437/OOPs Java/week 7/databaseJava/cw-db/src/main/java/edu/uob/CreateTokenizer.java
-/home/np24437/OOPs Java/week 7/databaseJava/cw-db/src/main/java/edu/uob/Condition.java
-/home/np24437/OOPs Java/week 7/databaseJava/cw-db/src/main/java/edu/uob/CompoundCondition.java
-/home/np24437/OOPs Java/week 7/databaseJava/cw-db/src/main/java/edu/uob/DBServer.java
-/home/np24437/OOPs Java/week 7/databaseJava/cw-db/src/main/java/edu/uob/ConditionParser.java
-/home/np24437/OOPs Java/week 7/databaseJava/cw-db/src/main/java/edu/uob/Table.java
-/home/np24437/OOPs Java/week 7/databaseJava/cw-db/src/main/java/edu/uob/SimpleCondition.java
+D:\Msc Computer Science\TB2\OOP Java\databaseJava\cw-db\src\main\java\edu\uob\DBServer.java
+D:\Msc Computer Science\TB2\OOP Java\databaseJava\cw-db\src\main\java\edu\uob\SimpleCondition.java
+D:\Msc Computer Science\TB2\OOP Java\databaseJava\cw-db\src\main\java\edu\uob\CommandParser.java
+D:\Msc Computer Science\TB2\OOP Java\databaseJava\cw-db\src\main\java\edu\uob\Condition.java
+D:\Msc Computer Science\TB2\OOP Java\databaseJava\cw-db\src\main\java\edu\uob\ConditionNode.java
+D:\Msc Computer Science\TB2\OOP Java\databaseJava\cw-db\src\main\java\edu\uob\DataBaseSupreme.java
+D:\Msc Computer Science\TB2\OOP Java\databaseJava\cw-db\src\main\java\edu\uob\DBClient.java
+D:\Msc Computer Science\TB2\OOP Java\databaseJava\cw-db\src\main\java\edu\uob\CreateTokenizer.java
+D:\Msc Computer Science\TB2\OOP Java\databaseJava\cw-db\src\main\java\edu\uob\CompoundCondition.java
+D:\Msc Computer Science\TB2\OOP Java\databaseJava\cw-db\src\main\java\edu\uob\ConditionParser.java
+D:\Msc Computer Science\TB2\OOP Java\databaseJava\cw-db\src\main\java\edu\uob\Database.java
+D:\Msc Computer Science\TB2\OOP Java\databaseJava\cw-db\src\main\java\edu\uob\Table.java

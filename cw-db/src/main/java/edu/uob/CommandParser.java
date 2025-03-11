@@ -314,9 +314,15 @@ public class CommandParser {
             result = executeSelect(tokens);
             StringBuilder resultString = new StringBuilder();
             for (Map<String, String> row : result) {
-                resultString.append(row.toString()).append("\n");
+                for (Map.Entry<String, String> entry : row.entrySet()) {
+                    resultString.append(entry.getKey())
+                            .append(" ")
+                            .append(entry.getValue())
+                            .append(" ");
+                }
+                resultString.append("\n");
             }
-            return resultString.toString() ;
+            return resultString.toString();
         }
         return "[ERROR] some mishap with the select command!";
     }
