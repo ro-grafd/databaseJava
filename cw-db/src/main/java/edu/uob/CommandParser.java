@@ -50,6 +50,8 @@ public class CommandParser {
         String tb2 = tokens.get(3);
         String at1 = tokens.get(5);
         String at2 = tokens.get(7);
+        if(!isAlphanumeric(tb1)) return "[ERROR]Table " + tb1 + " is not alphanumeric";
+        if(!isAlphanumeric(tb2)) return "[ERROR]Table " + tb2 + " is not alphanumeric";
         Database db = dataBaseSupreme.getCurrentDatabase();
         Table table1 = getTableFromName(tb1);
         Table table2 = getTableFromName(tb2);
@@ -123,6 +125,7 @@ public class CommandParser {
         }
 
         String tableName = tokens.get(2);
+        if(!isAlphanumeric(tableName)) return "[ERROR]Table " + tableName + " is not alphanumeric";
         Database db = dataBaseSupreme.getCurrentDatabase();
         if (db == null) {
             return "[ERROR]: Database not set!";
@@ -186,6 +189,7 @@ public class CommandParser {
         }
 
         String tableName = tokens.get(1);
+        if(!isAlphanumeric(tableName)) return "[ERROR]Table " + tableName + " is not alphanumeric";
         Database db = dataBaseSupreme.getCurrentDatabase();
         if(db == null) {
             return "[ERROR]: Database not set!";
@@ -271,6 +275,8 @@ public class CommandParser {
     private String handleSelect(ArrayList<String> tokens) {
         if(tokens.get(tokens.size()-3).equalsIgnoreCase("FROM")) {
             String tableName = tokens.get(tokens.size()-2);
+            if(!isAlphanumeric(tableName)) return "[ERROR]Table " + tableName + " is not alphanumeric";
+
             // Check if database is set
             if (dataBaseSupreme.getCurrentDatabase() == null) {
                 return "[ERROR]Database not set";
@@ -337,6 +343,14 @@ public class CommandParser {
         }
         // Extract table name from tokens
         String tableName = tokens.get(fromIndex + 1);
+        if (!isAlphanumeric(tableName)) {
+            // Create a list with a single error map
+            List<Map<String, String>> errorList = new ArrayList<>();
+            Map<String, String> errorMap = new HashMap<>();
+            errorMap.put("error", "[ERROR]Table " + tableName + " is not alphanumeric");
+            errorList.add(errorMap);
+            return errorList;
+        }
         Table table = getTableFromName(tableName);
 //        for(String column : table.getColumns()) {
 //            System.out.println(column + " <- index values");
@@ -459,6 +473,8 @@ public class CommandParser {
     }
     private String handleAlterTable(ArrayList<String> tokens) {
         String tableName = tokens.get(2);
+        if(!isAlphanumeric(tableName)) return "[ERROR]Table " + tableName + " is not alphanumeric";
+
         // Check if database is set
         if (dataBaseSupreme.getCurrentDatabase() == null) {
             return "[ERROR]Database not set";
@@ -612,6 +628,8 @@ public class CommandParser {
     }
     private String handleDropTable(ArrayList<String> tokens) {
         String tableName = tokens.get(2);
+        if(!isAlphanumeric(tableName)) return "[ERROR]Table " + tableName + " is not alphanumeric";
+
         // Check if the current database is set
         if (dataBaseSupreme.getCurrentDatabase() == null) {
             return "[ERROR]Database not set";
@@ -649,6 +667,7 @@ public class CommandParser {
 
     private String handleDropDatabase(ArrayList<String> tokens) {
         String toDeleteDatabase = tokens.get(2);
+        if(!isAlphanumeric(toDeleteDatabase)) return "[ERROR]Database " + toDeleteDatabase + " is not alphanumeric";
         Database db = dataBaseSupreme.getDatabase(toDeleteDatabase);
         if(db == null) {
             return "[ERROR]Database does not exist!";
@@ -692,6 +711,7 @@ public class CommandParser {
             return "[ERROR]No database is in use";
         }
         String tableName = tokens.get(2);
+        if(!isAlphanumeric(tableName)) return "[ERROR]Table " + tableName + " is not alphanumeric";
         // Check if the table exists in memory
         if (!db.searchTable(tableName)) {
             // Also check if the table file exists in the file system
@@ -764,7 +784,7 @@ public class CommandParser {
         }
 
         String tableName = tokens.get(2);
-
+        if(!isAlphanumeric(tableName)) return "[ERROR]Table " + tableName + " is not alphanumeric";
         // Check if the table already exists in memory
         if (db.searchTable(tableName)) {
             return "[ERROR]: Table already exists!";
@@ -811,6 +831,7 @@ public class CommandParser {
         }
     }
     private String handleCreateDatabase(String dbName) {
+        if(!isAlphanumeric(dbName)) return "[ERROR]Database: " + dbName + " is not alphanumeric";
         // Check if the database already exists in memory
         if (dataBaseSupreme.searchDatabases(dbName)) {
             return "[ERROR]: Database already exists in memory.";
@@ -831,6 +852,7 @@ public class CommandParser {
 
     private String handleUseDatabase(ArrayList<String> tokens) {
         String dbName = tokens.get(1);
+        if(!isAlphanumeric(dbName)) return "[ERROR]Database: " + dbName + " is not alphanumeric";
         // Check if already using the same database
         if (dataBaseSupreme.currentDatabase != null && dataBaseSupreme.currentDatabase.equals(dbName)) {
             return "Already in the same database";
@@ -848,5 +870,19 @@ public class CommandParser {
             return "[OK]Current database set to " + dbName;
         }
         return "[ERROR]: Database not found in memory or file system.";
+    }
+    public boolean isAlphanumeric(String str) {
+        if (str == null || str.isEmpty()) {
+            return false;
+        }
+
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if (!Character.isLetterOrDigit(c)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
