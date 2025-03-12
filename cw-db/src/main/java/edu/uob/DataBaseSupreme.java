@@ -15,15 +15,18 @@ import java.util.ArrayList;
 import java.util.*;
 
 class DataBaseSupreme {
+
     List<Database> databases;
     Database currentDatabase;
     List<String> databasenames;
     String storagePath;
+
     public DataBaseSupreme(String storageFolderPath) {
         this.storagePath = storageFolderPath;
         this.databases = new ArrayList<>();
         this.databasenames = new ArrayList<>();
     }
+
     public Database getDatabase(String databaseDelete) {
         // Check in-memory databases first
         for (Database database : databases) {
@@ -31,7 +34,6 @@ class DataBaseSupreme {
                 return database;
             }
         }
-
         // If not found in-memory, check the file system
         File dbFolder = new File(storagePath, databaseDelete);
         if (dbFolder.exists() && dbFolder.isDirectory()) {
@@ -42,7 +44,6 @@ class DataBaseSupreme {
             databases.add(db);  // Add the database to the in-memory list
             return db;
         }
-
         // If the database doesn't exist either in-memory or on the file system
         return null;
     }
@@ -51,7 +52,6 @@ class DataBaseSupreme {
         // Load tables from the file system (assuming the tables are stored in dbName folder)
         File dbFolder = new File(storagePath, db.getName());
         File[] tableFiles = dbFolder.listFiles((dir, name) -> name.endsWith(".tab")); // Assuming .tab extension for tables
-
         if (tableFiles != null) {
             for (File tableFile : tableFiles) {
                 // Assuming each table file is loaded by the loadTableFromFile method
@@ -64,11 +64,9 @@ class DataBaseSupreme {
         // Remove from in-memory collections
         databases.remove(databaseToDelete);
         databasenames.remove(databaseToDelete.getName());
-
         // Delete the physical database directory and its contents
         Path dbDirectoryPath = Paths.get(storagePath, databaseToDelete.getName());
         File dbDirectory = dbDirectoryPath.toFile();
-
         if (dbDirectory.exists() && dbDirectory.isDirectory()) {
             // Delete all files and subdirectories
             try {
@@ -97,15 +95,14 @@ class DataBaseSupreme {
                 }
             }
         }
-
         // Delete the empty directory
         if (!directory.delete()) {
             throw new IOException("Failed to delete directory: " + directory);
         }
     }
+
     public void addDatabase(Database db) {
         Path dbDirectoryPath = Paths.get(storagePath, db.getName());
-
         // Try to create the directory
         try {
             Files.createDirectories(dbDirectoryPath); // This will create the directory if it doesn't exist
@@ -117,15 +114,19 @@ class DataBaseSupreme {
         databases.add(db);
         databasenames.add(db.getName());
     }
+
     public void addDatabaseName(String dbname) {
         databasenames.add(dbname);
     }
+
     public void removeDatabase(Database db) {
         databases.remove(db);
     }
+
     public void removeDatabaseName(String dbname) {
         databasenames.remove(dbname);
     }
+
     public boolean searchDatabases(String dbName) {
         for(Database db : databases) {
             if(db.getName().equals(dbName)) {
@@ -134,9 +135,11 @@ class DataBaseSupreme {
         }
         return false;
     }
+
     public Database getCurrentDatabase() {
         return currentDatabase;
     }
+
     public void setCurrentDatabase(String dbName) {
         for (Database db : databases) {
             if (db.getName().equals(dbName)) {

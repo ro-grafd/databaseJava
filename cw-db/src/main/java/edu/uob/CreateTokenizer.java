@@ -3,20 +3,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class CreateTokenizer {
+
     private static final String[] specialCharacters = {"(",")",",",";", "=", "<", ">"};
     private static final String[] OTHER_CHARACTERS = {" <  = ", " =  = ", " >  = ", "! ="};
     private String query;
     private static ArrayList<String> tokens;
+
     public CreateTokenizer(String query) {
         this.query = query;
         tokens = new ArrayList<>();
     }
+
     public  ArrayList<String> tokenizeQuery() {
         ArrayList<String> tokens = new ArrayList<>();
-
         // Split the query on single quotes (to handle string literals properly)
         String[] fragments = query.split("'");
-
         for (int i = 0; i < fragments.length; i++) {
             // If it's a string literal, add it as a separate token
             if (i % 2 != 0) {
@@ -44,7 +45,6 @@ public class CreateTokenizer {
         while (input.contains("  ")) {
             input = input.replace("  ", " ");
         }
-
         // Trim and split into tokens
         input = input.trim();
         return input.split(" ");

@@ -1,6 +1,8 @@
 package edu.uob;
 import java.util.Map;
+
 public class CompoundCondition implements Condition {
+
     private Condition left;
     private Condition right;
     private String operator;

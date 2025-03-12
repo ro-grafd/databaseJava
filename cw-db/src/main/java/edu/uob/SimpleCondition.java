@@ -26,42 +26,36 @@ public class SimpleCondition implements Condition {
                     compareValue = value.substring(1, value.length() - 1);
                 }
                 return actualValue.equals(compareValue);
-
             case "!=":
                 String neqValue = value;
                 if (value.startsWith("'") && value.endsWith("'")) {
                     neqValue = value.substring(1, value.length() - 1);
                 }
                 return !actualValue.equals(neqValue);
-
             case ">":
                 try {
                     return Double.parseDouble(actualValue) > Double.parseDouble(value);
                 } catch (NumberFormatException e) {
                     return actualValue.compareTo(value) > 0; // Fallback to string comparison
                 }
-
             case "<":
                 try {
                     return Double.parseDouble(actualValue) < Double.parseDouble(value);
                 } catch (NumberFormatException e) {
                     return actualValue.compareTo(value) < 0;
                 }
-
             case ">=":
                 try {
                     return Double.parseDouble(actualValue) >= Double.parseDouble(value);
                 } catch (NumberFormatException e) {
                     return actualValue.compareTo(value) >= 0;
                 }
-
             case "<=":
                 try {
                     return Double.parseDouble(actualValue) <= Double.parseDouble(value);
                 } catch (NumberFormatException e) {
                     return actualValue.compareTo(value) <= 0;
                 }
-
             case "LIKE":
                 // Handle quoted patterns
                 String pattern = value;
@@ -71,7 +65,6 @@ public class SimpleCondition implements Condition {
                 // Convert SQL LIKE pattern to regex pattern
                 pattern = "^" + pattern.replace("%", ".*").replace("_", ".") + "$";
                 return actualValue.matches(pattern);
-
             default:
                 return false;
         }

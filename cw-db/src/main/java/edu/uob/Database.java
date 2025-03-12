@@ -10,14 +10,17 @@ import java.util.ArrayList;
 import java.util.*;
 
 class Database {
+
     private String name;
     private List<Table> tables;
     private String storagePath;
+
     public Database(String name, String storagePath) {
         this.storagePath = storagePath;
         this.name = name;
         this.tables = new ArrayList<>();
     }
+
     public void deleteTable(Table tableToDelete) {
         // Remove from in-memory collection
         tables.remove(tableToDelete);
@@ -36,6 +39,7 @@ class Database {
             System.out.println("Warning: Table file not found at: " + tableFile.getAbsolutePath());
         }
     }
+
     public void addTable(Table table, ArrayList<String> columns) {
         tables.add(table);
         // Ensure the database folder exists
@@ -43,39 +47,31 @@ class Database {
         if (!dbFolder.exists()) {
             dbFolder.mkdirs();  // Create the directory if it doesn't exist
         }
-
         // Debug: Check the folder path
         System.out.println("Database folder path: " + dbFolder.getAbsolutePath());
-
         // Create a file for the table (table name will be used as the filename)
         File tableFile = new File(dbFolder, table.getName() + ".tab");  // Use .tab or any extension
-
         // Debug: Check if file already exists
         System.out.println("Table file exists: " + tableFile.exists());
         System.out.println("Table file path: " + tableFile.getAbsolutePath());
-
         // If the table file doesn't exist, create it
         if (!tableFile.exists()) {
             try {
                 boolean fileCreated = tableFile.createNewFile();
                 if (fileCreated) {
                     System.out.println("Table file created: " + tableFile.getAbsolutePath());
-
                     // Write column headers to the file
                     try (FileWriter writer = new FileWriter(tableFile)) {
                         // Always add "id" as the first column
                         writer.write("id");
-
                         // Add the rest of the columns if not empty
                         if (columns != null && !columns.isEmpty()) {
                             for (String column : columns) {
                                 writer.write( "\t" + column);
                             }
                         }
-
                         // Add a newline at the end
                         writer.write("\n");
-
                         System.out.println("Column headers added to the table file.");
                     } catch (IOException e) {
                         System.out.println("Error writing to table file: " + e.getMessage());
@@ -93,6 +89,7 @@ class Database {
     {
         return name;
     }
+
     public boolean searchTable(String tableName) {
         for (Table tb : tables) {
             if(tb.getName().equals(tableName))
@@ -102,6 +99,7 @@ class Database {
         }
         return false;
     }
+
     public Table getTable(String tableName) {
         for (Table tb : tables) {
             if(tb.getName().equals(tableName)){
@@ -110,6 +108,7 @@ class Database {
         }
         return null;
     }
+
     public void displayDatabaseDetails() {
         System.out.println("Database: " + name);
         for (Table table : tables) {
@@ -117,6 +116,7 @@ class Database {
             System.out.println("------------------");
         }
     }
+
     public void loadTableFromFile(File tableFile) {
         try (BufferedReader reader = new BufferedReader(new FileReader(tableFile))) {
             String headerLine = reader.readLine(); // Read first line (column headers)
@@ -143,7 +143,6 @@ class Database {
             table.totalRows = table.data.size();
             table.totalColumns = table.colNames.size();
             // Add the table to the list
-
             tables.add(table);
             System.out.println("Table '" + table.getName() + "' loaded successfully from file.");
         } catch (IOException e) {
@@ -161,5 +160,4 @@ class Database {
                 .findFirst()
                 .orElse(null);
     }
-
 }

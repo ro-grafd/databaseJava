@@ -47,14 +47,12 @@ public class DBServer {
      */
     public String handleCommand(String command) {
         // TODO implement your server logic here
-//        command = command.trim().toUpperCase();
         CreateTokenizer tokenizer = new CreateTokenizer(command);
         ArrayList<String> tokens = tokenizer.tokenizeQuery();
         for(String token : tokens) {
             System.out.println(token);
         }
         String result = commandParser.parseQuery(tokens);
-//        result += "[OK]";
         return result;
     }
 

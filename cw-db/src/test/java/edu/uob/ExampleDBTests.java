@@ -101,4 +101,32 @@ public class ExampleDBTests {
         assertFalse(response.contains("[OK]"), "An attempt was made to access a non-existent table, however an [OK] tag was returned");
     }
 
+    // My test cases
+    @Test
+    public void testForUpdate(){
+        String randomName = generateRandomName();
+        sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        sendCommandToServer("USE " + randomName + ";");
+        sendCommandToServer("CREATE TABLE tb1 (at1, at2, at3);");
+        sendCommandToServer("INSERT INTO tb1 VALUES (v4, v8, v6);");
+        sendCommandToServer("INSERT INTO tb1 VALUES (v7, v8, v6);");
+        sendCommandToServer("UPDATE tb1 SET at2 = BB WHERE at3 == v6;");
+        String response = sendCommandToServer("SELECT * FROM tb1;");
+        assertTrue(response.contains("BB"), "To find if we have updated the table, however it was not returned by SELECT *");
+        assertFalse(response.contains("v8"),"To find if the old value is not there, however it was returned by SELECT *");
+    }
+
+    @Test
+    public void testForSelect(){
+        server = new DBServer();
+        String randomName = generateRandomName();
+        sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        sendCommandToServer("USE " + randomName + ";");
+        sendCommandToServer("CREATE TABLE tb2 (at1, at2, at3);");
+        sendCommandToServer("INSERT INTO tb2 VALUES (v1, v2, v3);");
+        sendCommandToServer("INSERT INTO tb2 VALUES (v4, v5, v6);");
+        String response = sendCommandToServer("SELECT at3 FROM tb2 WHERE at1==v1 AND at2 == v2;");
+        assertTrue(response.contains("v3"), "To find if compound condition handles, however it was not returned by SELECT ");
+        assertFalse(response.contains("v2"), "To find if compound condition handles, however it WAS returned");
+    }
 }
