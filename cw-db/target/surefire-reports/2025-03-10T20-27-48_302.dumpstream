@@ -1,4 +1,0 @@
-# Created at 2025-03-10T20:27:49.545
-Boot Manifest-JAR contains absolute paths in classpath 'D:\Msc Computer Science\TB2\OOP Java\databaseJava\cw-db\target\test-classes'
-Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
-

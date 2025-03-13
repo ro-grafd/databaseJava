@@ -20,7 +20,6 @@ public class SimpleCondition implements Condition {
         }
         switch (comparator) {
             case "==":
-                // Handle quoted values by removing the quotes
                 String compareValue = value;
                 if (value.startsWith("'") && value.endsWith("'")) {
                     compareValue = value.substring(1, value.length() - 1);
@@ -57,12 +56,10 @@ public class SimpleCondition implements Condition {
                     return actualValue.compareTo(value) <= 0;
                 }
             case "LIKE":
-                // Handle quoted patterns
                 String pattern = value;
                 if (pattern.startsWith("'") && pattern.endsWith("'")) {
                     pattern = pattern.substring(1, pattern.length() - 1);
                 }
-                // Convert SQL LIKE pattern to regex pattern
                 pattern = "^" + pattern.replace("%", ".*").replace("_", ".") + "$";
                 return actualValue.matches(pattern);
             default:

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.*;
 
 class Database {
-
     private String name;
     private List<Table> tables;
     private String storagePath;
@@ -22,12 +21,9 @@ class Database {
     }
 
     public void deleteTable(Table tableToDelete) {
-        // Remove from in-memory collection
         tables.remove(tableToDelete);
-        // Delete the physical table file
         File dbFolder = new File(storagePath + "/" + name);
         File tableFile = new File(dbFolder, tableToDelete.getName() + ".tab");
-
         if (tableFile.exists() && tableFile.isFile()) {
             boolean deleted = tableFile.delete();
             if (deleted) {
@@ -42,35 +38,26 @@ class Database {
 
     public void addTable(Table table, ArrayList<String> columns) {
         tables.add(table);
-        // Ensure the database folder exists
-        File dbFolder = new File(storagePath + "/" + name);  // Assuming the database folder is named after the database
+        File dbFolder = new File(storagePath + "/" + name);
         if (!dbFolder.exists()) {
-            dbFolder.mkdirs();  // Create the directory if it doesn't exist
+            dbFolder.mkdirs();
         }
-        // Debug: Check the folder path
         System.out.println("Database folder path: " + dbFolder.getAbsolutePath());
-        // Create a file for the table (table name will be used as the filename)
         File tableFile = new File(dbFolder, table.getName() + ".tab");  // Use .tab or any extension
-        // Debug: Check if file already exists
         System.out.println("Table file exists: " + tableFile.exists());
         System.out.println("Table file path: " + tableFile.getAbsolutePath());
-        // If the table file doesn't exist, create it
         if (!tableFile.exists()) {
             try {
                 boolean fileCreated = tableFile.createNewFile();
                 if (fileCreated) {
                     System.out.println("Table file created: " + tableFile.getAbsolutePath());
-                    // Write column headers to the file
                     try (FileWriter writer = new FileWriter(tableFile)) {
-                        // Always add "id" as the first column
                         writer.write("id");
-                        // Add the rest of the columns if not empty
                         if (columns != null && !columns.isEmpty()) {
                             for (String column : columns) {
                                 writer.write( "\t" + column);
                             }
                         }
-                        // Add a newline at the end
                         writer.write("\n");
                         System.out.println("Column headers added to the table file.");
                     } catch (IOException e) {
@@ -124,25 +111,18 @@ class Database {
                 System.out.println("ERROR: Table file is empty or corrupted: " + tableFile.getName());
                 return;
             }
-            // Extract column names from the first line
-//            System.out.println(headerLine);
             ArrayList<String> columns = new ArrayList<>(Arrays.asList(headerLine.trim().split("\\s+")));
             if (columns.get(0).equals("id")) {
                 columns.remove(0);
             }
-            // Create a new Table instance
             Table table = new Table(tableFile.getName().replace(".tab", ""), columns, this.name);
-            // Read the remaining rows to populate data and update totalRows
             String line;
             while ((line = reader.readLine()) != null) {
-                // Split each row into individual column values
                 List<String> rowData = new ArrayList<>(Arrays.asList(line.split("\\s*,\\s*")));
                 table.data.add(rowData);
             }
-            // Update table details
             table.totalRows = table.data.size();
             table.totalColumns = table.colNames.size();
-            // Add the table to the list
             tables.add(table);
             System.out.println("Table '" + table.getName() + "' loaded successfully from file.");
         } catch (IOException e) {

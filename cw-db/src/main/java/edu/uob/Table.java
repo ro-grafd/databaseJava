@@ -50,17 +50,17 @@ class Table {
 
     public List<List<String>> convertMapToTableData(List<Map<String, String>> mappedRows) {
         List<List<String>> tableData = new ArrayList<>();
-        int idCounter = 1; // Start ID from 1
+        int idCounter = 1;
         for (Map<String, String> rowMap : mappedRows) {
             List<String> row = new ArrayList<>();
-            row.add(String.valueOf(idCounter)); // Add the ID as the first column
+            row.add(String.valueOf(idCounter));
             for (String column : colNames) {
-                if (!column.equalsIgnoreCase("id")) { // Ensure "id" is not duplicated
-                    row.add(rowMap.getOrDefault(column, "")); // Ensure all columns exist
+                if (!column.equalsIgnoreCase("id")) {
+                    row.add(rowMap.getOrDefault(column, ""));
                 }
             }
             tableData.add(row);
-            idCounter++; // Increment ID for the next row
+            idCounter++;
         }
         return tableData;
     }
@@ -71,11 +71,9 @@ class Table {
             if (row.isEmpty()) continue;
             Map<String, String> rowMap = new HashMap<>();
             List<String> values = row;
-            // Process each column that has a corresponding value
             for (int i = 0; i < columns.size() && i < values.size(); i++) {
                 rowMap.put(columns.get(i), values.get(i));
             }
-            // Fill missing values with empty strings
             for (int i = values.size(); i < columns.size(); i++) {
                 rowMap.put(columns.get(i), "");
             }
@@ -97,25 +95,19 @@ class Table {
     }
 
     public void addColumn(String attributeName) {
-        // Check if column already exists
         if (colNames.contains(attributeName)) {
             System.out.println("Error: Column '" + attributeName + "' already exists");
             return;
         }
-        // Add the column name to the list
         this.colNames.add(attributeName);
         this.totalColumns = this.colNames.size();
-        // Add NULL values for the new column in each existing row
         for (List<String> row : data) {
             row.add("NULL");
         }
-        // Now update the .tab file with the modified data
         try {
             File dbFolder = new File(storageFolderPath + "/" + databaseName);
             File tableFile = new File(dbFolder, tableName + ".tab");
-            // Overwrite the file with the updated data
             try (FileWriter writer = new FileWriter(tableFile, false)) {
-                // Write the header row (column names)
                 for (int i = 0; i < colNames.size(); i++) {
                     writer.write(colNames.get(i));
                     if (i < colNames.size() - 1) {
@@ -123,7 +115,6 @@ class Table {
                     }
                 }
                 writer.write("\n");
-                // Write each data row
                 for (List<String> row : data) {
                     for (int i = 0; i < row.size(); i++) {
                         writer.write(row.get(i));
@@ -142,9 +133,7 @@ class Table {
     }
 
     public void deleteColumn(String attributeName) {
-        // Find the index of the column to delete
         int columnIndex = colNames.indexOf(attributeName);
-        // If column doesn't exist or is the ID column (which cannot be deleted), return
         if (columnIndex == -1) {
             System.out.println("Error: Column '" + attributeName + "' does not exist");
             return;
@@ -153,16 +142,13 @@ class Table {
             System.out.println("Error: Cannot delete the 'id' column");
             return;
         }
-        // Remove the column name
         colNames.remove(attributeName);
         this.totalColumns = this.colNames.size();
-        // Remove the column data from each row
         for (List<String> row : data) {
             if (columnIndex < row.size()) {
                 row.remove(columnIndex);
             }
         }
-        // Now update the .tab file with the modified data
         try {
             File dbFolder = new File(storageFolderPath + "/" + databaseName);
             File tableFile = new File(dbFolder, tableName + ".tab");
@@ -176,7 +162,6 @@ class Table {
                     }
                 }
                 writer.write("\n");
-                // Write each data row
                 for (List<String> row : data) {
                     for (int i = 0; i < row.size(); i++) {
                         writer.write(row.get(i));
@@ -195,41 +180,27 @@ class Table {
     }
 
     public void addValues(String tableName, ArrayList<String> values) {
-        // Check if this is for the right table
         if (!this.tableName.equals(tableName)) {
             System.out.println("Error: Table name mismatch");
             return;
         }
-        // Generate an ID for the new row (assuming auto-increment)
         String id = String.valueOf(++this.totalRows);
-        // Create a new row with the ID as the first value
         List<String> row = new ArrayList<>();
         row.add(id);
-        // Add the rest of the values
         row.addAll(values);
-        // If row size doesn't match column count, log a warning
         if (row.size() != this.totalColumns) {
             System.out.println("size mismatch");
         }
-        // Add the row to the in-memory data
         this.data.add(row);
-        // Now, append the row to the .tab file
         try {
-            // Assuming storage path and database name are accessible
-            // You might need to pass these as parameters or make them class variables
             File dbFolder = new File(storageFolderPath + "/" + databaseName);
             File tableFile = new File(dbFolder, tableName + ".tab");
-            // Append to the file using FileWriter with append flag set to true
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(tableFile, true))) {
-                // Write the ID first
                 writer.write(id);
-                // Write each value separated by tab
                 for (String value : values) {
                     writer.write("\t" + value);
                 }
-                // Add a newline at the end of the row
                 writer.write("\n");
-                // Force flush to ensure data is written
                 writer.flush();
                 System.out.println("Row successfully added to table file");
             }
@@ -241,16 +212,13 @@ class Table {
 
     public String displayColumns(ArrayList<String> requestedColumns) {
         StringBuilder result = new StringBuilder();
-        // If the list is empty or null, return
         if (requestedColumns == null || requestedColumns.isEmpty()) {
             return "[ERROR]No columns specified for display";
         }
-        // Special case: if the first element is "*", display all columns
         if (requestedColumns.size() == 1 && requestedColumns.get(0).equals("*")) {
             displayTableDetails();
             return toString();
         }
-        // Find the indices of the requested columns
         ArrayList<Integer> columnIndices = new ArrayList<>();
         for (String colName : requestedColumns) {
             int index = colNames.indexOf(colName);
@@ -260,13 +228,10 @@ class Table {
                 System.out.println("Warning: Column '" + colName + "' does not exist in table");
             }
         }
-        // If no valid columns found, return
         if (columnIndices.isEmpty()) {
             return "[ERROR]None of the requested columns exist in the table";
         }
-        // Add header to the result
         result.append("Table: ").append(tableName).append("\n");
-        // Add column names to the result
         for (int i = 0; i < columnIndices.size(); i++) {
             int index = columnIndices.get(i);
             result.append(colNames.get(index));
@@ -275,7 +240,6 @@ class Table {
             }
         }
         result.append("\n"); // New line after column headers
-        // Add data for the selected columns to the result
         for (List<String> row : data) {
             for (int i = 0; i < columnIndices.size(); i++) {
                 int colIndex = columnIndices.get(i);
@@ -300,7 +264,6 @@ class Table {
         System.out.println("Columns: " + colNames);
         System.out.println("Total Columns: " + totalColumns);
         System.out.println("Total Rows: " + totalRows);
-        // Display the actual data
         System.out.println("Data:");
         for (List<String> row : data) {
             System.out.println(row);
@@ -310,17 +273,14 @@ class Table {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-
         sb.append("Table Name: ").append(tableName).append("\n");
         sb.append("Columns: ").append(colNames).append("\n");
         sb.append("Total Columns: ").append(totalColumns).append("\n");
         sb.append("Total Rows: ").append(totalRows).append("\n");
         sb.append("Data:\n");
-
         for (List<String> row : data) {
             sb.append(row).append("\n");
         }
-
         return sb.toString();
     }
     public boolean checkAttribute(String attributeName) {

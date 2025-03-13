@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 public class ConditionParser {
     public static Condition parse(String whereClause) {
         whereClause = whereClause.trim();
-        // If there's a logical operator (AND / OR), split and process recursively
         if (whereClause.contains(" AND ") || whereClause.contains(" OR ")) {
             String[] parts;
             String operator;
@@ -20,12 +19,11 @@ public class ConditionParser {
             }
             return new CompoundCondition(parse(parts[0].trim()), operator, parse(parts[1].trim()));
         }
-        // Handle simple conditions like "attribute == value"
         Pattern pattern = Pattern.compile("([a-zA-Z0-9_]+)\\s*(==|!=|>=|<=|>|<|LIKE)\\s*(['\"]?)(.*?)\\3");
         Matcher matcher = pattern.matcher(whereClause);
         if (matcher.matches()) {
             return new SimpleCondition(matcher.group(1), matcher.group(2), matcher.group(4));
         }
-        throw new IllegalArgumentException("Invalid WHERE clause: " + whereClause);
+        return null;
     }
 }
